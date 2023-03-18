@@ -4,7 +4,9 @@ use std::{collections::HashMap, env::Vars};
 mod defaults;
 
 #[derive(Debug, Clone)]
-pub struct NetworkSettings {}
+pub struct NetworkSettings {
+    pub url: String,
+}
 
 #[derive(Debug, Clone)]
 pub struct DatabaseSettings {
@@ -44,7 +46,9 @@ pub fn read_ergo_indexer_config(vars: Vars) -> ErgoIndexerConfig {
             envs.get("CHAIN_POLL_DURATION_SECS").unwrap().as_str(),
         )
         .unwrap(),
-        network: NetworkSettings {},
+        network: NetworkSettings {
+            url: envs.get("NETWORK_URL").unwrap().to_string(),
+        },
         db: DatabaseSettings {
             url: envs.get("DATABASE_URL").unwrap().to_string(),
             user: envs.get("DATABASE_USER").unwrap().to_string(),
