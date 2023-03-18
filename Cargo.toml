@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 dotenv = "0.15"
+log = "0.4"
+sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls" , "postgres" ] }
 
 [[bin]]
 path = "bin/indexer.rs"
