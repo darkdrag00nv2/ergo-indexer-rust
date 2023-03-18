@@ -2,6 +2,9 @@ use sqlx::{
     postgres::{PgConnectOptions, PgPoolOptions},
     ConnectOptions, QueryBuilder, Row,
 };
+use anyhow::Result;
+
+use crate::config::DatabaseSettings;
 
 pub mod models;
 
@@ -10,4 +13,8 @@ pub struct Database {
     pub db_conn: sqlx::Pool<sqlx::Postgres>,
 }
 
-impl Database {}
+impl Database {
+    pub async fn new(database: &DatabaseSettings) -> Result<Self> {
+        todo!()
+    }
+}
