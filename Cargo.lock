@@ -234,6 +234,7 @@ dependencies = [
  "log",
  "simple_logger",
  "sqlx",
+ "thiserror",
  "tokio",
 ]
 

@@ -1,5 +1,7 @@
 use std::fmt::Debug;
 use std::{collections::HashMap, env::Vars};
+use crate::common::Height;
+
 
 mod defaults;
 
@@ -22,10 +24,10 @@ pub struct RedisSettings {
 
 #[derive(Debug, Clone)]
 pub struct ErgoIndexerConfig {
-    pub chain_poll_duration_secs: i32,
+    pub chain_poll_duration_secs: u64,
     pub network: NetworkSettings,
     pub db: DatabaseSettings,
-    pub start_height: u64,
+    pub start_height: Height,
     pub redis: RedisSettings,
 }
 
@@ -42,7 +44,7 @@ pub fn read_ergo_indexer_config(vars: Vars) -> ErgoIndexerConfig {
     }
 
     ErgoIndexerConfig {
-        chain_poll_duration_secs: str::parse::<i32>(
+        chain_poll_duration_secs: str::parse::<u64>(
             envs.get("CHAIN_POLL_DURATION_SECS").unwrap().as_str(),
         )
         .unwrap(),

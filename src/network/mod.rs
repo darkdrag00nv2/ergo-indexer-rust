@@ -1,3 +1,6 @@
+use anyhow::Result;
+use crate::common::Height;
+
 /// A service providing an access to the Ergo network.
 pub struct ErgoLiveNetwork {
     pub base_url: String,
@@ -10,7 +13,7 @@ impl ErgoLiveNetwork {
         }
     }
 
-    pub async fn get_best_height(&self) -> u64 {
+    pub async fn get_best_height(&self) -> Result<Height> {
         todo!()
     }
 }
