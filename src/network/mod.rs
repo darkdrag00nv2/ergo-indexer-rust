@@ -7,6 +7,10 @@ use rand::seq::SliceRandom;
 use jsonrpsee::core::{client::ClientT, rpc_params};
 use jsonrpsee_http_client::{HttpClient, HttpClientBuilder};
 
+pub mod models;
+
+use self::models::api_node_info::ApiNodeInfo;
+
 /// A service providing an access to the Ergo network.
 #[derive(Debug, Clone)]
 pub struct ErgoLiveNetwork {
@@ -35,10 +39,13 @@ impl ErgoLiveNetwork {
     pub async fn get_best_height(&self) -> Result<Height> {
         let client = self.get_client();
 
-        Ok(100)
+        let raw_info = client.request("/info", rpc_params![]).await?;
+        let block = serde_json::from_value::<ApiNodeInfo>(raw_info)?;
+
+        Ok(block.full_height)
     }
 
-    /// Returns a random client out the client pool so that we can load balance between different 
+    /// Returns a random client out the client pool so that we can load balance between different
     /// Ergo nodes. At this point there is only a single node.
     fn get_client(&self) -> &HttpClient {
         let client = self.clients.choose(&mut rand::thread_rng()).unwrap();

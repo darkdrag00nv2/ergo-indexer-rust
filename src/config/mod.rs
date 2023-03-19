@@ -1,7 +1,6 @@
+use crate::common::Height;
 use std::fmt::Debug;
 use std::{collections::HashMap, env::Vars};
-use crate::common::Height;
-
 
 mod defaults;
 
@@ -56,7 +55,7 @@ pub fn read_ergo_indexer_config(vars: Vars) -> ErgoIndexerConfig {
             user: envs.get("DATABASE_USER").unwrap().to_string(),
             password: envs.get("DATABASE_PWD").unwrap().to_string(),
         },
-        start_height: str::parse::<u64>(envs.get("START_HEIGHT").unwrap().as_str()).unwrap(),
+        start_height: str::parse::<i32>(envs.get("START_HEIGHT").unwrap().as_str()).unwrap(),
         redis: RedisSettings {
             url: envs.get("REDIS_URL").unwrap().to_string(),
         },
