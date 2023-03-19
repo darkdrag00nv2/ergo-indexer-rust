@@ -27,6 +27,9 @@ pub async fn start_indexing(config: ErgoIndexerConfig) -> Result<()> {
     info!("Starting indexer sync...");
     loop {
         indexer.sync().await.expect("Unexpected error in sync.");
+        // TODO: We are not really polling every chain_poll_duration_secs. Instead we are polling 
+        // every processing time + chain_poll_duration_secs. Consider having a separate thread for 
+        // polling so that indexing loop doesn't have to wait for receiving the network block height.
         sleep(Duration::from_secs(chain_poll_duration_secs));
     }
 }
@@ -75,10 +78,10 @@ impl ErgoIndexer {
     }
 
     async fn get_last_grabbed_block_height(&self) -> Result<Height> {
-        todo!()
+        Ok(0)
     }
 
     async fn perform_indexing_at_height(&self, height: Height) -> Result<i32> {
-        todo!()
+        Ok(0)
     }
 }
