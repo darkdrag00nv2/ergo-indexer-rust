@@ -11,7 +11,8 @@ pub struct NetworkSettings {
 
 #[derive(Debug, Clone)]
 pub struct DatabaseSettings {
-    pub url: String,
+    pub host: String,
+    pub port: u16,
     pub user: String,
     pub password: String,
 }
@@ -51,7 +52,8 @@ pub fn read_ergo_indexer_config(vars: Vars) -> ErgoIndexerConfig {
             url: envs.get("NETWORK_URL").unwrap().to_string(),
         },
         db: DatabaseSettings {
-            url: envs.get("DATABASE_URL").unwrap().to_string(),
+            host: envs.get("DATABASE_HOST").unwrap().to_string(),
+            port: str::parse::<u16>(envs.get("DATABASE_PORT").unwrap().as_str()).unwrap(),
             user: envs.get("DATABASE_USER").unwrap().to_string(),
             password: envs.get("DATABASE_PWD").unwrap().to_string(),
         },

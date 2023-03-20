@@ -1,11 +1,12 @@
 use crate::common::{BlockId, HexString};
 use serde::{Serialize, Deserialize};
+use sqlx::FromRow;
 
 use super::api_node_info_epoch_parameters::ApiNodeInfoEpochParameters;
 
 /// A model mirroring `NodeInfo` entity from Ergo node REST API.
 /// See `NodeInfo` in https://github.com/ergoplatform/ergo/blob/master/src/main/resources/api/openapi.yaml
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, FromRow)]
 pub struct ApiNodeInfo {
     pub current_time: i64,
     pub name: String,

@@ -27,8 +27,8 @@ pub async fn start_indexing(config: ErgoIndexerConfig) -> Result<()> {
     info!("Starting indexer sync...");
     loop {
         indexer.sync().await.expect("Unexpected error in sync.");
-        // TODO: We are not really polling every chain_poll_duration_secs. Instead we are polling 
-        // every processing time + chain_poll_duration_secs. Consider having a separate thread for 
+        // TODO: We are not really polling every chain_poll_duration_secs. Instead we are polling
+        // every processing time + chain_poll_duration_secs. Consider having a separate thread for
         // polling so that indexing loop doesn't have to wait for receiving the network block height.
         sleep(Duration::from_secs(chain_poll_duration_secs));
     }
@@ -38,14 +38,19 @@ pub struct ErgoIndexer {
     pub config: ErgoIndexerConfig,
     pub network: ErgoLiveNetwork,
     pub repos: RepoBundle,
+    start_height: Height,
 }
 
 impl ErgoIndexer {
     pub fn new(config: ErgoIndexerConfig, network: ErgoLiveNetwork, repos: RepoBundle) -> Self {
+        // TODO: Making the start_height optional and use genesis height as default.
+        let start_height = config.start_height;
+
         ErgoIndexer {
             config,
             network,
             repos,
+            start_height,
         }
     }
 
@@ -78,7 +83,11 @@ impl ErgoIndexer {
     }
 
     async fn get_last_grabbed_block_height(&self) -> Result<Height> {
-        Ok(0)
+        let stored_in_db = match self.repos.headers.get_best_height().await? {
+            Some(h) => h,
+            None => self.start_height,
+        };
+        Ok(std::cmp::max(stored_in_db, self.start_height - 1))
     }
 
     async fn perform_indexing_at_height(&self, height: Height) -> Result<i32> {

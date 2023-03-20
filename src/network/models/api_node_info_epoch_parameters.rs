@@ -1,7 +1,8 @@
 use crate::common::Height;
 use serde::{Serialize, Deserialize};
+use sqlx::FromRow;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, FromRow)]
 pub struct ApiNodeInfoEpochParameters {
     pub height: Height,
     pub storage_fee_factor: i32,
