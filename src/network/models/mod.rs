@@ -1,2 +1,10 @@
+pub mod api_block_transactions;
+pub mod api_data_input;
+pub mod api_full_block;
+pub mod api_header;
+pub mod api_input;
 pub mod api_node_info;
 pub mod api_node_info_epoch_parameters;
+pub mod api_output;
+pub mod api_spending_proof;
+pub mod api_transaction;

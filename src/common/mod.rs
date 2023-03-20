@@ -18,6 +18,7 @@ pub type Height = i32;
 pub type BlockId = HexString;
 pub type TokenId = HexString;
 pub type BoxId = String;
+pub type TxId = String;
 
 #[derive(Error, Debug)]
 pub enum ErgoIndexerError {

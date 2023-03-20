@@ -2,6 +2,7 @@ use std::{thread::sleep, time::Duration};
 
 use crate::common::{ErgoIndexerError, Height};
 use anyhow::{bail, Result};
+use common::BlockId;
 use config::ErgoIndexerConfig;
 use log::info;
 use network::ErgoLiveNetwork;
@@ -43,7 +44,7 @@ pub struct ErgoIndexer {
 
 impl ErgoIndexer {
     pub fn new(config: ErgoIndexerConfig, network: ErgoLiveNetwork, repos: RepoBundle) -> Self {
-        // TODO: Making the start_height optional and use genesis height as default.
+        // TODO: Make the start_height optional and use genesis height as default.
         let start_height = config.start_height;
 
         ErgoIndexer {
@@ -91,6 +92,12 @@ impl ErgoIndexer {
     }
 
     async fn perform_indexing_at_height(&self, height: Height) -> Result<i32> {
+        let ids: Vec<BlockId> = self.network.get_block_ids_at_height(height).await?;
+        info!("Grabbing blocks at height {}: {:#?}", height, ids);
+
+        // Why we have to move the id inside the async closure: https://stackoverflow.com/a/63437482.
+        let full_block_tasks = ids.into_iter().map(|id| {});
+
         Ok(0)
     }
 }

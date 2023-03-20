@@ -5,14 +5,12 @@ use anyhow::Result;
 use crate::{common::Height, database::Database};
 
 pub struct HeaderRepo {
-    db: Rc<Database>
+    db: Rc<Database>,
 }
 
 impl HeaderRepo {
     pub fn new(db: Rc<Database>) -> Self {
-        HeaderRepo {
-            db
-        }
+        HeaderRepo { db }
     }
 
     pub async fn get_best_height(&self) -> Result<Option<Height>> {

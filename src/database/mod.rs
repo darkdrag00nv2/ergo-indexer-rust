@@ -1,5 +1,8 @@
-use anyhow::{Result, Ok};
-use sqlx::{postgres::{PgConnectOptions, PgPoolOptions}, Row};
+use anyhow::{Ok, Result};
+use sqlx::{
+    postgres::{PgConnectOptions, PgPoolOptions},
+    Row,
+};
 
 use crate::{common::Height, config::DatabaseSettings};
 
@@ -30,14 +33,15 @@ impl Database {
         let row = sqlx::query(
             "select height from node_headers where main_chain = true order by height desc limit 1",
         )
-        .fetch_optional(&self.conn_pool).await?;
+        .fetch_optional(&self.conn_pool)
+        .await?;
 
         match row {
             Some(r) => {
                 let height: i32 = r.try_get("height")?;
                 Ok(Some(height))
-            },
-            None => Ok(None)
+            }
+            None => Ok(None),
         }
     }
 }

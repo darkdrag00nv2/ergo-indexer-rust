@@ -1,5 +1,5 @@
 use crate::common::{BlockId, HexString};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
 use super::api_node_info_epoch_parameters::ApiNodeInfoEpochParameters;
@@ -24,5 +24,5 @@ pub struct ApiNodeInfo {
     pub state_version: HexString,
     pub launch_time: i64,
     pub parameters: ApiNodeInfoEpochParameters,
-    pub is_mining: bool
+    pub is_mining: bool,
 }

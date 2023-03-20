@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::common::Height;
+use crate::common::{Height, BlockId};
 use anyhow::Result;
 use rand::seq::SliceRandom;
 
@@ -9,7 +9,7 @@ use jsonrpsee_http_client::{HttpClient, HttpClientBuilder};
 
 pub mod models;
 
-use self::models::api_node_info::ApiNodeInfo;
+use self::models::{api_node_info::ApiNodeInfo, api_full_block::ApiFullBlock};
 
 /// A service providing an access to the Ergo network.
 #[derive(Debug, Clone)]
@@ -43,6 +43,14 @@ impl ErgoLiveNetwork {
         let block = serde_json::from_value::<ApiNodeInfo>(raw_info)?;
 
         Ok(block.full_height)
+    }
+
+    pub async fn get_block_ids_at_height(&self, height: Height) -> Result<Vec<BlockId>> {
+        todo!()
+    }
+
+    pub async fn get_full_block_by_id(&self, id: BlockId) -> Result<ApiFullBlock> {
+        todo!()
     }
 
     /// Returns a random client out the client pool so that we can load balance between different
