@@ -31,12 +31,6 @@ pub struct ErgoIndexerConfig {
     pub redis: RedisSettings,
 }
 
-impl ErgoIndexerConfig {
-    pub fn new() -> Self {
-        todo!()
-    }
-}
-
 pub fn read_ergo_indexer_config(vars: Vars) -> ErgoIndexerConfig {
     let mut envs = HashMap::new();
     for (key, value) in vars {

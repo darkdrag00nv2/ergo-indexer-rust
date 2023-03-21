@@ -1,11 +1,11 @@
-use std::{thread::sleep, time::Duration};
+use std::{process::id, sync::Arc, thread::sleep, time::Duration, vec};
 
 use crate::common::{ErgoIndexerError, Height};
 use anyhow::{bail, Result};
 use common::BlockId;
 use config::ErgoIndexerConfig;
 use log::info;
-use network::ErgoLiveNetwork;
+use network::{ErgoLiveNetwork, models::api_full_block::ApiFullBlock};
 use repo::RepoBundle;
 
 pub mod common;
@@ -16,7 +16,7 @@ pub mod redis;
 pub mod repo;
 
 pub async fn start_indexing(config: ErgoIndexerConfig) -> Result<()> {
-    let network = ErgoLiveNetwork::new(config.network.url.to_owned());
+    let network = Arc::new(ErgoLiveNetwork::new(config.network.url.to_owned()));
     let repos = RepoBundle::new(&config.db)
         .await
         .expect("Couldn't create RepoBundle.");
@@ -37,13 +37,17 @@ pub async fn start_indexing(config: ErgoIndexerConfig) -> Result<()> {
 
 pub struct ErgoIndexer {
     pub config: ErgoIndexerConfig,
-    pub network: ErgoLiveNetwork,
+    pub network: Arc<ErgoLiveNetwork>,
     pub repos: RepoBundle,
     start_height: Height,
 }
 
 impl ErgoIndexer {
-    pub fn new(config: ErgoIndexerConfig, network: ErgoLiveNetwork, repos: RepoBundle) -> Self {
+    pub fn new(
+        config: ErgoIndexerConfig,
+        network: Arc<ErgoLiveNetwork>,
+        repos: RepoBundle,
+    ) -> Self {
         // TODO: Make the start_height optional and use genesis height as default.
         let start_height = config.start_height;
 
@@ -93,11 +97,53 @@ impl ErgoIndexer {
 
     async fn perform_indexing_at_height(&self, height: Height) -> Result<i32> {
         let ids: Vec<BlockId> = self.network.get_block_ids_at_height(height).await?;
+        let block_count = ids.len();
         info!("Grabbing blocks at height {}: {:#?}", height, ids);
 
-        // Why we have to move the id inside the async closure: https://stackoverflow.com/a/63437482.
-        let full_block_tasks = ids.into_iter().map(|id| {});
+        let full_block_tasks = ids.clone().into_iter().map(|id| {
+            let network = Arc::clone(&self.network);
+            tokio::spawn(async move {
+                let network = Arc::clone(&network);
+                network.get_full_block_by_id(id).await
+            })
+        });
+        let mut blocks = vec![];
+        for fbt in full_block_tasks {
+            blocks.push(fbt.await??);
+        }
 
-        Ok(0)
+        let mut best_block = vec![];
+        let mut orphaned_blocks = vec![];
+        for block in blocks {
+            match ids.first() {
+                Some(id) => {
+                    if id.value.contains(&block.header.id.value) {
+                        best_block.push(block);
+                    } else {
+                        orphaned_blocks.push(block);
+                    }
+                }
+                None => continue,
+            }
+        }
+
+        info!("Best block is {:#?}", best_block);
+        info!("Orphaned blocks are {:#?}", orphaned_blocks);
+        debug_assert!(
+            best_block.len() == 1,
+            "{}",
+            format!(
+                "Exactly one best block was expected for height {}, blocks: {:#?}",
+                height, best_block
+            )
+        );
+
+        self.apply_best_block(&best_block[0]).await?;
+
+        Ok(block_count as i32)
+    }
+
+    async fn apply_best_block(&self, block: &ApiFullBlock) -> Result<()> {
+        todo!()
     }
 }

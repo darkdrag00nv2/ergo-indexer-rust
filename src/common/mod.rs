@@ -2,7 +2,7 @@ use thiserror::Error;
 use serde::{Serialize, Deserialize};
 
 /// Represents a hex string. Must always be initialized with HexString::new.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HexString {
     pub value: String,
 }
