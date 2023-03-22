@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use anyhow::Result;
 
-use crate::{common::Height, database::Database};
+use crate::{common::{Height, BlockId}, database::{Database, models::header::Header}};
 
 pub struct HeaderRepo {
     db: Rc<Database>,
@@ -15,5 +15,9 @@ impl HeaderRepo {
 
     pub async fn get_best_height(&self) -> Result<Option<Height>> {
         self.db.get_best_height().await
+    }
+
+    pub async fn get(&self, id: &BlockId) -> Result<Option<Header>> {
+        todo!()
     }
 }

@@ -49,7 +49,7 @@ impl ErgoLiveNetwork {
         todo!()
     }
 
-    pub async fn get_full_block_by_id(&self, id: BlockId) -> Result<ApiFullBlock> {
+    pub async fn get_full_block_by_id(&self, id: BlockId) -> Result<Option<ApiFullBlock>> {
         todo!()
     }
 

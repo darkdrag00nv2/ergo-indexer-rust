@@ -1,11 +1,13 @@
-use std::{process::id, sync::Arc, thread::sleep, time::Duration, vec};
+use std::{sync::Arc, thread::sleep, time::Duration, vec};
 
 use crate::common::{ErgoIndexerError, Height};
 use anyhow::{bail, Result};
+use async_recursion::async_recursion;
 use common::BlockId;
 use config::ErgoIndexerConfig;
+use database::models::{block_stats::BlockStats, flat_block::FlatBlock, header::Header};
 use log::info;
-use network::{ErgoLiveNetwork, models::api_full_block::ApiFullBlock};
+use network::{models::api_full_block::ApiFullBlock, ErgoLiveNetwork};
 use repo::RepoBundle;
 
 pub mod common;
@@ -115,15 +117,20 @@ impl ErgoIndexer {
         let mut best_block = vec![];
         let mut orphaned_blocks = vec![];
         for block in blocks {
-            match ids.first() {
-                Some(id) => {
-                    if id.value.contains(&block.header.id.value) {
-                        best_block.push(block);
-                    } else {
-                        orphaned_blocks.push(block);
+            match block {
+                Some(block) => match ids.first() {
+                    Some(id) => {
+                        if id.value.contains(&block.header.id.value) {
+                            best_block.push(block);
+                        } else {
+                            orphaned_blocks.push(block);
+                        }
                     }
-                }
-                None => continue,
+                    None => continue,
+                },
+                None => bail!(ErgoIndexerError::BlockNotFoundForId(BlockId::new(
+                    String::from("TODO")
+                ))),
             }
         }
 
@@ -139,11 +146,69 @@ impl ErgoIndexer {
         );
 
         self.apply_best_block(&best_block[0]).await?;
-
         Ok(block_count as i32)
     }
 
+    // TODO: This Send bound might be needed to make sure that the returned future can be sent
+    // between threads. Right now, we have removed it.
+    #[async_recursion(?Send)]
     async fn apply_best_block(&self, block: &ApiFullBlock) -> Result<()> {
+        let id = &block.header.id;
+        let height = block.header.height;
+        let parent_id = &block.header.parent_id;
+        let parent_height = block.header.height - 1;
+
+        match self.get_block(parent_id).await? {
+            Some(parent_block) if parent_block.main_chain => {}
+            None if block.header.height == self.start_height => {}
+            Some(parent_block) => {
+                info!("Parent block {} needs to be updated", parent_id);
+                self.update_best_block(parent_block).await?;
+            }
+            None => {
+                info!("Parent block {} needs to be downloaded", parent_id);
+                let parent_block = self.network.get_full_block_by_id(parent_id.clone()).await?;
+                match parent_block {
+                    Some(parent_block) => self.apply_best_block(&parent_block).await?,
+                    None => bail!(ErgoIndexerError::InconsistentNodeView(
+                        parent_id.clone(),
+                        parent_height
+                    )),
+                }
+            }
+        }
+
+        let parent_info = self.get_block_info(parent_id).await?;
+        let flat_block = self.scan(block, parent_info).await?;
+        self.insert_block(&flat_block).await?;
+        self.mark_as_main(id, height).await
+    }
+
+    async fn update_best_block(&self, parent_block: Header) -> Result<()> {
         todo!()
+    }
+
+    async fn insert_block(&self, block: &FlatBlock) -> Result<()> {
+        todo!()
+    }
+
+    async fn mark_as_main(&self, id: &BlockId, height: Height) -> Result<()> {
+        todo!()
+    }
+
+    async fn scan(
+        &self,
+        api_full_block: &ApiFullBlock,
+        prev_block_info_opt: Option<BlockStats>,
+    ) -> Result<FlatBlock> {
+        todo!()
+    }
+
+    async fn get_block(&self, id: &BlockId) -> Result<Option<Header>> {
+        self.repos.headers.get(id).await
+    }
+
+    async fn get_block_info(&self, id: &BlockId) -> Result<Option<BlockStats>> {
+        self.repos.blocks_info.get(id).await
     }
 }

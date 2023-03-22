@@ -1,3 +1,5 @@
+use core::fmt;
+
 use thiserror::Error;
 use serde::{Serialize, Deserialize};
 
@@ -5,6 +7,12 @@ use serde::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HexString {
     pub value: String,
+}
+
+impl fmt::Display for HexString {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.value)
+    }
 }
 
 impl HexString {
@@ -20,8 +28,31 @@ pub type TokenId = HexString;
 pub type BoxId = String;
 pub type TxId = String;
 
+/// Represents an address. Must always be initialized with Address::new.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Address {
+    pub value: String,
+}
+
+impl fmt::Display for Address {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+
+impl Address {
+    pub fn new(value: String) -> Self {
+        // TODO: validate the format.
+        Address { value }
+    }
+}
+
 #[derive(Error, Debug)]
 pub enum ErgoIndexerError {
-    #[error("zero blocks written for height: {0}")]
+    #[error("Zero blocks written for height: {0}")]
     ZeroBlocksWritten(Height),
+    #[error("Block not found for id: {0}")]
+    BlockNotFoundForId(BlockId),
+    #[error("Failed to pull best block with id: {0} and height: {1}")]
+    InconsistentNodeView(BlockId, Height),
 }
