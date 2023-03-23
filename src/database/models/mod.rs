@@ -1,15 +1,13 @@
-use crate::common::{BlockId, HexString};
-
-pub mod header;
+pub mod ad_proof;
+pub mod asset;
+pub mod block_extension;
 pub mod block_stats;
-pub mod flat_block;
-pub mod transaction;
-pub mod input;
+pub mod box_register;
 pub mod data_input;
-
-/// Represents `node_ad_proofs` table.
-pub struct AdProof {
-    pub header_id: BlockId,
-    pub proof_of_bytes: HexString, // serialized and hex-encoded AVL+ tree path
-    pub digest: HexString,         // hex-encoded tree root hash
-}
+pub mod flat_block;
+pub mod header;
+pub mod input;
+pub mod output;
+pub mod script_constant;
+pub mod token;
+pub mod transaction;
