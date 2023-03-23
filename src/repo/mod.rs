@@ -4,14 +4,20 @@ use crate::{config::DatabaseSettings, database::Database};
 use anyhow::Result;
 
 use self::{
-    block_info::BlockInfoRepo, data_input::DataInputRepo, header::HeaderRepo, input::InputRepo,
-    transaction::TransactionRepo,
+    asset::AssetRepo, block_info::BlockInfoRepo, box_register::BoxRegisterRepo,
+    data_input::DataInputRepo, header::HeaderRepo, input::InputRepo, output::OutputRepo,
+    script_constants::ScriptConstantsRepo, token::TokenRepo, transaction::TransactionRepo,
 };
 
+mod asset;
 mod block_info;
+mod box_register;
 mod data_input;
 mod header;
 mod input;
+mod output;
+mod script_constants;
+mod token;
 mod transaction;
 
 pub struct RepoBundle {
@@ -21,6 +27,11 @@ pub struct RepoBundle {
     pub txs: TransactionRepo,
     pub inputs: InputRepo,
     pub data_inputs: DataInputRepo,
+    pub outputs: OutputRepo,
+    pub assets: AssetRepo,
+    pub registers: BoxRegisterRepo,
+    pub tokens: TokenRepo,
+    pub constants: ScriptConstantsRepo,
 }
 
 impl RepoBundle {
@@ -34,6 +45,11 @@ impl RepoBundle {
             txs: TransactionRepo::new(database.clone()),
             inputs: InputRepo::new(database.clone()),
             data_inputs: DataInputRepo::new(database.clone()),
+            outputs: OutputRepo::new(database.clone()),
+            assets: AssetRepo::new(database.clone()),
+            registers: BoxRegisterRepo::new(database.clone()),
+            tokens: TokenRepo::new(database.clone()),
+            constants: ScriptConstantsRepo::new(database.clone()),
         })
     }
 }

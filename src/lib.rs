@@ -194,11 +194,17 @@ impl ErgoIndexer {
             self.repos.txs.insert_many(&block.txs),
             self.repos.inputs.insert_many(&block.inputs),
             self.repos.data_inputs.insert_many(&block.data_inputs),
+            self.repos.outputs.insert_many(&block.outputs),
+            self.repos.assets.insert_many(&block.assets),
+            self.repos.tokens.insert_many(&block.tokens),
         );
         insertion_tasks.0?;
         insertion_tasks.1?;
         insertion_tasks.2?;
         insertion_tasks.3?;
+        insertion_tasks.4?;
+        insertion_tasks.5?;
+        insertion_tasks.6?;
         Ok(())
     }
 
