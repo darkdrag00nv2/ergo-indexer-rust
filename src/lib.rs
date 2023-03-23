@@ -189,7 +189,17 @@ impl ErgoIndexer {
     }
 
     async fn insert_block(&self, block: &FlatBlock) -> Result<()> {
-        todo!()
+        let insertion_tasks = tokio::join!(
+            self.repos.headers.insert(&block.header),
+            self.repos.txs.insert_many(&block.txs),
+            self.repos.inputs.insert_many(&block.inputs),
+            self.repos.data_inputs.insert_many(&block.data_inputs),
+        );
+        insertion_tasks.0?;
+        insertion_tasks.1?;
+        insertion_tasks.2?;
+        insertion_tasks.3?;
+        Ok(())
     }
 
     async fn mark_as_main(&self, id: &BlockId, height: Height) -> Result<()> {
@@ -201,6 +211,10 @@ impl ErgoIndexer {
         api_full_block: &ApiFullBlock,
         prev_block_info_opt: Option<BlockStats>,
     ) -> Result<FlatBlock> {
+        // FlatBlock {
+        //     header: todo!(),
+        //     info: todo!(),
+        // }
         todo!()
     }
 

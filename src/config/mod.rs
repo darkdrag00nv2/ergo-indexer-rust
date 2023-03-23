@@ -1,4 +1,4 @@
-use crate::common::Height;
+use crate::common::{Address, Height};
 use std::fmt::Debug;
 use std::{collections::HashMap, env::Vars};
 
@@ -23,10 +23,17 @@ pub struct RedisSettings {
 }
 
 #[derive(Debug, Clone)]
+pub struct ProtocolSettings {
+    pub network_prefix: String,
+    pub genesis_address: Address,
+}
+
+#[derive(Debug, Clone)]
 pub struct ErgoIndexerConfig {
     pub chain_poll_duration_secs: u64,
     pub network: NetworkSettings,
     pub db: DatabaseSettings,
+    pub protocol: ProtocolSettings,
     pub start_height: Height,
     pub redis: RedisSettings,
 }
@@ -44,6 +51,10 @@ pub fn read_ergo_indexer_config(vars: Vars) -> ErgoIndexerConfig {
         .unwrap(),
         network: NetworkSettings {
             url: envs.get("NETWORK_URL").unwrap().to_string(),
+        },
+        protocol: ProtocolSettings {
+            network_prefix: envs.get("NETWORK_PREFIX").unwrap().to_string(),
+            genesis_address: Address::new(envs.get("NETWORK_PREFIX").unwrap().to_string()),
         },
         db: DatabaseSettings {
             host: envs.get("DATABASE_HOST").unwrap().to_string(),

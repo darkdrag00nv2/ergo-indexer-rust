@@ -3,6 +3,9 @@ use crate::common::{BlockId, HexString};
 pub mod header;
 pub mod block_stats;
 pub mod flat_block;
+pub mod transaction;
+pub mod input;
+pub mod data_input;
 
 /// Represents `node_ad_proofs` table.
 pub struct AdProof {

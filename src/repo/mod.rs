@@ -3,15 +3,24 @@ use std::rc::Rc;
 use crate::{config::DatabaseSettings, database::Database};
 use anyhow::Result;
 
-use self::{header::HeaderRepo, block_info::BlockInfoRepo};
+use self::{
+    block_info::BlockInfoRepo, data_input::DataInputRepo, header::HeaderRepo, input::InputRepo,
+    transaction::TransactionRepo,
+};
 
-mod header;
 mod block_info;
+mod data_input;
+mod header;
+mod input;
+mod transaction;
 
 pub struct RepoBundle {
     pub database: Rc<Database>,
     pub headers: HeaderRepo,
     pub blocks_info: BlockInfoRepo,
+    pub txs: TransactionRepo,
+    pub inputs: InputRepo,
+    pub data_inputs: DataInputRepo,
 }
 
 impl RepoBundle {
@@ -22,6 +31,9 @@ impl RepoBundle {
             database: database.clone(),
             headers: HeaderRepo::new(database.clone()),
             blocks_info: BlockInfoRepo::new(database.clone()),
+            txs: TransactionRepo::new(database.clone()),
+            inputs: InputRepo::new(database.clone()),
+            data_inputs: DataInputRepo::new(database.clone()),
         })
     }
 }

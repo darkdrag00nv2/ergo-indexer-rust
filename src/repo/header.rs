@@ -20,4 +20,8 @@ impl HeaderRepo {
     pub async fn get(&self, id: &BlockId) -> Result<Option<Header>> {
         todo!()
     }
+
+    pub async fn insert(&self, header: &Header) -> Result<()> {
+        todo!()
+    }
 }
