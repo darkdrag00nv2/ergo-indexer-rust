@@ -24,4 +24,8 @@ impl HeaderRepo {
     pub async fn insert(&self, header: &Header) -> Result<()> {
         todo!()
     }
+
+    pub async fn update_chain_status_by_id(&self, id: &BlockId, new_chain_status: bool) -> Result<()> {
+        todo!()
+    }
 }

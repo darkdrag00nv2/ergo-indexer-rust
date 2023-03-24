@@ -1,7 +1,7 @@
 use std::{sync::Arc, thread::sleep, time::Duration, vec};
 
 use crate::common::{ErgoIndexerError, Height};
-use anyhow::{bail, Result};
+use anyhow::{bail, Ok, Result};
 use async_recursion::async_recursion;
 use common::{BlockId, BlockIdWithHeight};
 use config::ErgoIndexerConfig;
@@ -275,7 +275,33 @@ impl ErgoIndexer {
     }
 
     async fn update_chain_status(&self, id: &BlockId, is_main_chain: bool) -> Result<()> {
-        todo!()
+        self.repos
+            .headers
+            .update_chain_status_by_id(id, is_main_chain)
+            .await?;
+        if self.config.indexes.block_stats {
+            self.repos
+                .blocks_info
+                .update_chain_status_by_header_id(id, is_main_chain)
+                .await?;
+        }
+        self.repos
+            .txs
+            .update_chain_status_by_header_id(id, is_main_chain)
+            .await?;
+        self.repos
+            .outputs
+            .update_chain_status_by_header_id(id, is_main_chain)
+            .await?;
+        self.repos
+            .inputs
+            .update_chain_status_by_header_id(id, is_main_chain)
+            .await?;
+        self.repos
+            .data_inputs
+            .update_chain_status_by_header_id(id, is_main_chain)
+            .await?;
+        Ok(())
     }
 
     async fn get_block(&self, id: &BlockId) -> Result<Option<Header>> {
