@@ -16,4 +16,8 @@ impl BlockInfoRepo {
     pub async fn get(&self, id: &BlockId) -> Result<Option<BlockStats>> {
         todo!()
     }
+
+    pub async fn insert(&self, block_info: &BlockStats) -> Result<()> {
+        todo!()
+    }
 }

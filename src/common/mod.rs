@@ -4,7 +4,7 @@ use thiserror::Error;
 use serde::{Serialize, Deserialize};
 
 /// Represents a hex string. Must always be initialized with HexString::new.
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct HexString {
     pub value: String,
 }
@@ -27,6 +27,7 @@ pub type BlockId = HexString;
 pub type TokenId = HexString;
 pub type BoxId = String;
 pub type TxId = String;
+pub type BlockIdWithHeight = (BlockId, Height);
 
 /// Represents an address. Must always be initialized with Address::new.
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -29,11 +29,21 @@ pub struct ProtocolSettings {
 }
 
 #[derive(Debug, Clone)]
+pub struct EnabledIndexes {
+    pub box_registers: bool,
+    pub script_constants: bool,
+    pub block_extensions: bool,
+    pub ad_proofs: bool,
+    pub block_stats: bool,
+}
+
+#[derive(Debug, Clone)]
 pub struct ErgoIndexerConfig {
     pub chain_poll_duration_secs: u64,
     pub network: NetworkSettings,
     pub db: DatabaseSettings,
     pub protocol: ProtocolSettings,
+    pub indexes: EnabledIndexes,
     pub start_height: Height,
     pub redis: RedisSettings,
 }
@@ -61,6 +71,21 @@ pub fn read_ergo_indexer_config(vars: Vars) -> ErgoIndexerConfig {
             port: str::parse::<u16>(envs.get("DATABASE_PORT").unwrap().as_str()).unwrap(),
             user: envs.get("DATABASE_USER").unwrap().to_string(),
             password: envs.get("DATABASE_PWD").unwrap().to_string(),
+        },
+        indexes: EnabledIndexes {
+            box_registers: str::parse::<bool>(envs.get("INDEX_BOX_REGISTERS").unwrap().as_str())
+                .unwrap(),
+            script_constants: str::parse::<bool>(
+                envs.get("INDEX_SCRIPT_CONSTANTS").unwrap().as_str(),
+            )
+            .unwrap(),
+            block_extensions: str::parse::<bool>(
+                envs.get("INDEX_BLOCK_EXTENSIONS").unwrap().as_str(),
+            )
+            .unwrap(),
+            ad_proofs: str::parse::<bool>(envs.get("INDEX_AD_PROOFS").unwrap().as_str()).unwrap(),
+            block_stats: str::parse::<bool>(envs.get("INDEX_BLOCK_STATS").unwrap().as_str())
+                .unwrap(),
         },
         start_height: str::parse::<i32>(envs.get("START_HEIGHT").unwrap().as_str()).unwrap(),
         redis: RedisSettings {

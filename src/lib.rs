@@ -3,7 +3,7 @@ use std::{sync::Arc, thread::sleep, time::Duration, vec};
 use crate::common::{ErgoIndexerError, Height};
 use anyhow::{bail, Result};
 use async_recursion::async_recursion;
-use common::BlockId;
+use common::{BlockId, BlockIdWithHeight};
 use config::ErgoIndexerConfig;
 use database::models::{block_stats::BlockStats, flat_block::FlatBlock, header::Header};
 use log::info;
@@ -25,7 +25,7 @@ pub async fn start_indexing(config: ErgoIndexerConfig) -> Result<()> {
 
     // Save poll duration before config is moved into ErgoIndexer.
     let chain_poll_duration_secs = config.chain_poll_duration_secs;
-    let indexer = ErgoIndexer::new(config, network, repos);
+    let mut indexer = ErgoIndexer::new(config, network, repos);
 
     info!("Starting indexer sync...");
     loop {
@@ -38,10 +38,11 @@ pub async fn start_indexing(config: ErgoIndexerConfig) -> Result<()> {
 }
 
 pub struct ErgoIndexer {
-    pub config: ErgoIndexerConfig,
-    pub network: Arc<ErgoLiveNetwork>,
-    pub repos: RepoBundle,
+    config: ErgoIndexerConfig,
+    network: Arc<ErgoLiveNetwork>,
+    repos: RepoBundle,
     start_height: Height,
+    pending_chain_updates: Vec<BlockIdWithHeight>,
 }
 
 impl ErgoIndexer {
@@ -58,10 +59,12 @@ impl ErgoIndexer {
             network,
             repos,
             start_height,
+            // TODO: Do we need a mutex? Most likely not.
+            pending_chain_updates: Vec::new(),
         }
     }
 
-    pub async fn sync(&self) -> Result<()> {
+    pub async fn sync(&mut self) -> Result<()> {
         let (network_height, local_height) = tokio::join!(
             self.network.get_best_height(),
             self.get_last_grabbed_block_height()
@@ -97,7 +100,7 @@ impl ErgoIndexer {
         Ok(std::cmp::max(stored_in_db, self.start_height - 1))
     }
 
-    async fn perform_indexing_at_height(&self, height: Height) -> Result<i32> {
+    async fn perform_indexing_at_height(&mut self, height: Height) -> Result<i32> {
         let ids: Vec<BlockId> = self.network.get_block_ids_at_height(height).await?;
         let block_count = ids.len();
         info!("Grabbing blocks at height {}: {:#?}", height, ids);
@@ -146,13 +149,14 @@ impl ErgoIndexer {
         );
 
         self.apply_best_block(&best_block[0]).await?;
+        self.commit_chain_updates().await?;
         Ok(block_count as i32)
     }
 
     // TODO: This Send bound might be needed to make sure that the returned future can be sent
     // between threads. Right now, we have removed it.
     #[async_recursion(?Send)]
-    async fn apply_best_block(&self, block: &ApiFullBlock) -> Result<()> {
+    async fn apply_best_block(&mut self, block: &ApiFullBlock) -> Result<()> {
         let id = &block.header.id;
         let height = block.header.height;
         let parent_id = &block.header.parent_id;
@@ -181,13 +185,11 @@ impl ErgoIndexer {
         let parent_info = self.get_block_info(parent_id).await?;
         let flat_block = self.scan(block, parent_info).await?;
         self.insert_block(&flat_block).await?;
-        self.mark_as_main(id, height).await
+        Ok(self.mark_as_main(id, height).await)
     }
 
-    async fn update_best_block(&self, parent_block: Header) -> Result<()> {
-        todo!()
-    }
-
+    // TODO: Consider using spawn or join for optional writes as well. Could be done using an empty
+    // task for false cases.
     async fn insert_block(&self, block: &FlatBlock) -> Result<()> {
         let insertion_tasks = tokio::join!(
             self.repos.headers.insert(&block.header),
@@ -198,6 +200,24 @@ impl ErgoIndexer {
             self.repos.assets.insert_many(&block.assets),
             self.repos.tokens.insert_many(&block.tokens),
         );
+        if self.config.indexes.block_stats {
+            self.repos.blocks_info.insert(&block.info).await?
+        }
+        if self.config.indexes.block_extensions {
+            self.repos.block_extensions.insert(&block.extension).await?
+        }
+        if self.config.indexes.ad_proofs {
+            if let Some(ad_proof) = &block.ad_proof_opt {
+                self.repos.ad_proofs.insert(ad_proof).await?
+            }
+        }
+        if self.config.indexes.box_registers {
+            self.repos.registers.insert_many(&block.registers).await?
+        }
+        if self.config.indexes.box_registers {
+            self.repos.constants.insert_many(&block.constants).await?
+        }
+
         insertion_tasks.0?;
         insertion_tasks.1?;
         insertion_tasks.2?;
@@ -208,7 +228,11 @@ impl ErgoIndexer {
         Ok(())
     }
 
-    async fn mark_as_main(&self, id: &BlockId, height: Height) -> Result<()> {
+    async fn mark_as_main(&mut self, id: &BlockId, height: Height) {
+        self.pending_chain_updates.push((id.clone(), height));
+    }
+
+    async fn update_best_block(&self, parent_block: Header) -> Result<()> {
         todo!()
     }
 
@@ -224,8 +248,42 @@ impl ErgoIndexer {
         todo!()
     }
 
+    async fn commit_chain_updates(&mut self) -> Result<()> {
+        info!(
+            "Updating {} chain slots: {:#?}",
+            self.pending_chain_updates.len(),
+            self.pending_chain_updates
+        );
+
+        for (id, height) in &self.pending_chain_updates {
+            let blocks = self.get_header_ids_at_height(height).await?;
+            let mut non_best_blocks = vec![];
+            for block in &blocks {
+                if block != id {
+                    non_best_blocks.push(block);
+                }
+            }
+
+            self.update_chain_status(id, true).await?;
+            for non_best in non_best_blocks {
+                self.update_chain_status(non_best, false).await?;
+            }
+        }
+
+        self.pending_chain_updates.clear();
+        Ok(())
+    }
+
+    async fn update_chain_status(&self, id: &BlockId, is_main_chain: bool) -> Result<()> {
+        todo!()
+    }
+
     async fn get_block(&self, id: &BlockId) -> Result<Option<Header>> {
         self.repos.headers.get(id).await
+    }
+
+    async fn get_header_ids_at_height(&self, height: &Height) -> Result<Vec<BlockId>> {
+        todo!()
     }
 
     async fn get_block_info(&self, id: &BlockId) -> Result<Option<BlockStats>> {
