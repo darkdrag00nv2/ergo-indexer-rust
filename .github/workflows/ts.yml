@@ -9,6 +9,9 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
@@ -23,6 +26,9 @@ jobs:
       matrix:
         os: [ubuntu-22.04, macos-12, windows-2022]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: ./api
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
