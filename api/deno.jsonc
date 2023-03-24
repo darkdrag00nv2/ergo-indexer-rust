@@ -1,0 +1,15 @@
+{
+    "fmt": {
+      "files": {
+        "exclude": [".vscode", "dist", "node_modules"]
+      }
+    },
+    "lint": {
+      "files": {
+        "exclude": [".vscode", "dist", "node_modules"]
+      }
+    },
+    "tasks": {
+      "run": "denon run --allow-env --allow-read --allow-net app.ts"
+    }
+  }
