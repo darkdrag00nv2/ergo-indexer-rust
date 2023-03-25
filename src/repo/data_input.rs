@@ -25,6 +25,8 @@ impl DataInputRepo {
         header_id: &BlockId,
         new_chain_status: bool,
     ) -> Result<()> {
-        todo!()
+        self.db
+            .update_chain_status_by_header_id("node_data_inputs", header_id, new_chain_status)
+            .await
     }
 }

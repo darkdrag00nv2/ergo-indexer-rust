@@ -28,6 +28,8 @@ impl TransactionRepo {
         header_id: &BlockId,
         new_chain_status: bool,
     ) -> Result<()> {
-        todo!()
+        self.db
+            .update_chain_status_by_header_id("node_transactions", header_id, new_chain_status)
+            .await
     }
 }

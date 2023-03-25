@@ -1,7 +1,7 @@
 use anyhow::{Ok, Result};
 use sqlx::{
     postgres::{PgConnectOptions, PgPoolOptions},
-    query, QueryBuilder, Row,
+    QueryBuilder, Row,
 };
 
 use crate::{
@@ -114,6 +114,22 @@ impl Database {
         sqlx::query("update node_headers set main_chain = ? where id = ?")
             .bind(new_chain_status)
             .bind(&id.value)
+            .execute(&self.conn_pool)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn update_chain_status_by_header_id(
+        &self,
+        table_name: &str,
+        header_id: &BlockId,
+        new_chain_status: bool,
+    ) -> Result<()> {
+        sqlx::query("update ? set main_chain = ? where header_id = ?")
+            .bind(table_name)
+            .bind(new_chain_status)
+            .bind(&header_id.value)
             .execute(&self.conn_pool)
             .await?;
 
