@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use crate::common::Height;
 
 static PRE_GENESIS_HEIGHT: Height = 0;
