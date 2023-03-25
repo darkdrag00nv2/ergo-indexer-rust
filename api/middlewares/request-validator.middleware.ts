@@ -1,4 +1,4 @@
-import { flattenMessages, validate, ValidationRules, httpErrors } from "../deps.ts";
+import { httpErrors, validate, ValidationRules } from "../deps.ts";
 import { Context } from "../types/core/context.ts";
 
 /**
@@ -17,7 +17,7 @@ const requestValidator = ({ bodyRules }: { bodyRules: ValidationRules }) => {
 
     /** check rules */
     const [isValid, errors] = await validate(body!, bodyRules);
-    const flattenErrors = flattenMessages(errors);
+    // const flattenErrors = flattenMessages(errors);
     if (!isValid) {
       throw new httpErrors.BadRequest("TODO: Add message");
     }
