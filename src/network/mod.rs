@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::common::{Height, BlockId};
+use crate::common::{BlockId, Height};
 use anyhow::Result;
 use rand::seq::SliceRandom;
 
@@ -9,7 +9,7 @@ use jsonrpsee_http_client::{HttpClient, HttpClientBuilder};
 
 pub mod models;
 
-use self::models::{api_node_info::ApiNodeInfo, api_full_block::ApiFullBlock};
+use self::models::{api_full_block::ApiFullBlock, api_node_info::ApiNodeInfo};
 
 /// A service providing an access to the Ergo network.
 #[derive(Debug, Clone)]

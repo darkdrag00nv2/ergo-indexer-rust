@@ -2,7 +2,10 @@ use std::rc::Rc;
 
 use anyhow::Result;
 
-use crate::{common::{Height, BlockId}, database::{Database, models::header::Header}};
+use crate::{
+    common::{BlockId, Height},
+    database::{models::header::Header, Database},
+};
 
 pub struct HeaderRepo {
     db: Rc<Database>,
@@ -26,10 +29,16 @@ impl HeaderRepo {
     }
 
     pub async fn insert(&self, header: &Header) -> Result<()> {
-        todo!()
+        self.db.insert_header(header).await
     }
 
-    pub async fn update_chain_status_by_id(&self, id: &BlockId, new_chain_status: bool) -> Result<()> {
-        todo!()
+    pub async fn update_chain_status_by_id(
+        &self,
+        id: &BlockId,
+        new_chain_status: bool,
+    ) -> Result<()> {
+        self.db
+            .update_chain_status_by_id(id, new_chain_status)
+            .await
     }
 }

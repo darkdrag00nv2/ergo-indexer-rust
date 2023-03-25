@@ -1,5 +1,5 @@
 use crate::common::Height;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
 #[derive(Serialize, Deserialize, Debug, FromRow)]

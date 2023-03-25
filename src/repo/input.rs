@@ -4,7 +4,10 @@ use anyhow::Result;
 
 use crate::{
     common::{BlockId, Height},
-    database::{models::{header::Header, input::Input}, Database},
+    database::{
+        models::{header::Header, input::Input},
+        Database,
+    },
 };
 
 pub struct InputRepo {
@@ -20,7 +23,11 @@ impl InputRepo {
         todo!()
     }
 
-    pub async fn update_chain_status_by_header_id(&self, header_id: &BlockId, new_chain_status: bool) -> Result<()> {
+    pub async fn update_chain_status_by_header_id(
+        &self,
+        header_id: &BlockId,
+        new_chain_status: bool,
+    ) -> Result<()> {
         todo!()
     }
 }

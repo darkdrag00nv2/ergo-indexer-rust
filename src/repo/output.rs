@@ -2,7 +2,13 @@ use std::rc::Rc;
 
 use anyhow::Result;
 
-use crate::{common::{Height, BlockId}, database::{Database, models::{header::Header, transaction::Transaction, output::Output}}};
+use crate::{
+    common::{BlockId, Height},
+    database::{
+        models::{header::Header, output::Output, transaction::Transaction},
+        Database,
+    },
+};
 
 pub struct OutputRepo {
     db: Rc<Database>,
@@ -17,7 +23,11 @@ impl OutputRepo {
         todo!()
     }
 
-    pub async fn update_chain_status_by_header_id(&self, header_id: &BlockId, new_chain_status: bool) -> Result<()> {
+    pub async fn update_chain_status_by_header_id(
+        &self,
+        header_id: &BlockId,
+        new_chain_status: bool,
+    ) -> Result<()> {
         todo!()
     }
 }

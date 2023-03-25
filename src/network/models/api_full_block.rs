@@ -8,5 +8,5 @@ use super::api_header::ApiHeader;
 #[derive(Serialize, Deserialize, Debug, FromRow)]
 pub struct ApiFullBlock {
     pub header: ApiHeader,
-    pub size: i32
+    pub size: i32,
 }

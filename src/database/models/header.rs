@@ -10,8 +10,7 @@ pub struct Header {
     pub id: BlockId,
     #[sqlx(try_from = "String")]
     pub parent_id: BlockId,
-    #[sqlx(try_from = "i16")]
-    pub version: u8,
+    pub version: i16,
     pub height: Height,
     pub n_bits: i64,
     // pub difficulty: BigDecimal,

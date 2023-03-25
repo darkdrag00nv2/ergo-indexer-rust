@@ -4,10 +4,10 @@ use crate::{config::DatabaseSettings, database::Database};
 use anyhow::Result;
 
 use self::{
-    asset::AssetRepo, block_extension::BlockExtensionRepo, block_info::BlockInfoRepo,
-    box_register::BoxRegisterRepo, data_input::DataInputRepo, header::HeaderRepo, input::InputRepo,
-    output::OutputRepo, script_constants::ScriptConstantsRepo, token::TokenRepo,
-    transaction::TransactionRepo, ad_proofs::AdProofRepo,
+    ad_proofs::AdProofRepo, asset::AssetRepo, block_extension::BlockExtensionRepo,
+    block_info::BlockInfoRepo, box_register::BoxRegisterRepo, data_input::DataInputRepo,
+    header::HeaderRepo, input::InputRepo, output::OutputRepo,
+    script_constants::ScriptConstantsRepo, token::TokenRepo, transaction::TransactionRepo,
 };
 
 mod ad_proofs;

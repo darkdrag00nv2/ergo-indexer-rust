@@ -1,8 +1,8 @@
 use core::fmt;
 
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use thiserror::Error;
-use serde::{Serialize, Deserialize};
 
 /// Represents a hex string. Must always be initialized with HexString::new.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, FromRow)]

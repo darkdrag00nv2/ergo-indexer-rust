@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-use crate::common::{BlockId, Height, Address};
+use crate::common::{Address, BlockId, Height};
 
 /// Represents `blocks_info` table.
 #[derive(Serialize, Deserialize, Debug, FromRow)]
@@ -28,5 +28,5 @@ pub struct BlockStats {
     pub total_coins_in_txs: i64,
     pub max_tx_gix: i64,
     pub max_box_gix: i64,
-    pub main_chain: bool
+    pub main_chain: bool,
 }
