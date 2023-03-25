@@ -309,7 +309,8 @@ impl ErgoIndexer {
     }
 
     async fn get_header_ids_at_height(&self, height: &Height) -> Result<Vec<BlockId>> {
-        todo!()
+        let headers = self.repos.headers.get_all_by_height(height).await?;
+        Ok(headers.into_iter().map(|h| h.id).collect())
     }
 
     async fn get_block_info(&self, id: &BlockId) -> Result<Option<BlockStats>> {

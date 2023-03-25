@@ -18,7 +18,11 @@ impl HeaderRepo {
     }
 
     pub async fn get(&self, id: &BlockId) -> Result<Option<Header>> {
-        todo!()
+        self.db.get_header_by_block_id(id).await
+    }
+
+    pub async fn get_all_by_height(&self, height: &Height) -> Result<Vec<Header>> {
+        self.db.get_all_headers_by_height(height).await
     }
 
     pub async fn insert(&self, header: &Header) -> Result<()> {

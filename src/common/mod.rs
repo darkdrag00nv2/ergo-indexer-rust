@@ -1,10 +1,11 @@
 use core::fmt;
 
+use sqlx::FromRow;
 use thiserror::Error;
 use serde::{Serialize, Deserialize};
 
 /// Represents a hex string. Must always be initialized with HexString::new.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, FromRow)]
 pub struct HexString {
     pub value: String,
 }
@@ -12,6 +13,12 @@ pub struct HexString {
 impl fmt::Display for HexString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.value)
+    }
+}
+
+impl From<std::string::String> for HexString {
+    fn from(value: std::string::String) -> Self {
+        HexString::new(value)
     }
 }
 
@@ -38,6 +45,12 @@ pub struct Address {
 impl fmt::Display for Address {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.value)
+    }
+}
+
+impl From<std::string::String> for Address {
+    fn from(value: std::string::String) -> Self {
+        Address::new(value)
     }
 }
 

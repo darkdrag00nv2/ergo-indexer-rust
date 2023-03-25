@@ -4,7 +4,12 @@ use sqlx::{
     Row,
 };
 
-use crate::{common::Height, config::DatabaseSettings};
+use crate::{
+    common::{BlockId, Height},
+    config::DatabaseSettings,
+};
+
+use self::models::header::Header;
 
 pub mod models;
 
@@ -43,5 +48,21 @@ impl Database {
             }
             None => Ok(None),
         }
+    }
+
+    pub async fn get_header_by_block_id(&self, id: &BlockId) -> Result<Option<Header>> {
+        Ok(sqlx::query_as::<_, Header>(
+                "SELECT id, parent_id, version, height, n_bits, difficulty, timestamp, state_root, ad_proofs_root, transactions_root, extension_hash, miner_pk, w, n, d, votes, main_chain FROM node_headers WHERE id = ?"
+            )
+            .bind(&id.value)
+            .fetch_optional(&self.conn_pool).await?)
+    }
+
+    pub async fn get_all_headers_by_height(&self, height: &Height) -> Result<Vec<Header>> {
+        Ok(sqlx::query_as::<_, Header>(
+                "SELECT id, parent_id, version, height, n_bits, difficulty, timestamp, state_root, ad_proofs_root, transactions_root, extension_hash, miner_pk, w, n, d, votes, main_chain FROM node_headers WHERE height = ?"
+            )
+            .bind(&height)
+            .fetch_all(&self.conn_pool).await?)
     }
 }
