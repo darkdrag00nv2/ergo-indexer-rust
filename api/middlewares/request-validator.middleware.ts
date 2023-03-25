@@ -16,7 +16,7 @@ const requestValidator = ({ bodyRules }: { bodyRules: ValidationRules }) => {
     }
 
     /** check rules */
-    const [isValid, errors] = await validate(body!, bodyRules);
+    const [isValid, _errors] = await validate(body!, bodyRules);
     // const flattenErrors = flattenMessages(errors);
     if (!isValid) {
       throw new httpErrors.BadRequest("TODO: Add message");
