@@ -11,6 +11,8 @@
   },
   "tasks": {
     "run": "denon run --allow-env --allow-read --allow-net app.ts",
-    "build": "deno compile -A --output bin/api app.ts"
+    "build": "deno compile -A --output bin/api app.ts",
+    "fmt": "deno fmt",
+    "lint": "deno lint"
   }
 }
