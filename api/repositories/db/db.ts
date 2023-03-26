@@ -6,10 +6,11 @@ export class DbPool {
 
   constructor() {
     const dbOptions: postgres.ClientOptions = {
-      database: config.DB_NAME,
-      hostname: config.DB_HOST,
-      user: config.DB_USER,
-      password: config.DB_PASS,
+      database: config.DATABASE_NAME,
+      hostname: config.DATABASE_HOST,
+      user: config.DATABASE_USER,
+      password: config.DATABASE_PWD,
+      port: config.DATABASE_PORT,
     };
 
     this.pool = new postgres.Pool(

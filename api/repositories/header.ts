@@ -12,7 +12,7 @@ export class HeaderRepo {
       {
         text:
 "SELECT id, parent_id, version, height, n_bits, difficulty, timestamp, state_root, \
-            ad_proofs_state, transactions_root, extension_hash, miner_pk, w, n, d, votes, main_chain \
+            ad_proofs_root, transactions_root, extension_hash, miner_pk, w, n, d, votes, main_chain \
             from node_headers where main_chain = true order by height desc limit 1",
         camelcase: true,
       },
