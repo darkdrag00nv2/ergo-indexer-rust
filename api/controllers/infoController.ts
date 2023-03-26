@@ -4,8 +4,8 @@ import { Context } from "./../types/core/context.ts";
 export class InfoController {
   constructor(private statsService: StatsService) {}
 
-  getInfo = (ctx: Context) => {
-    const info = this.statsService.getBlockChainInfo();
+  getInfo = async (ctx: Context) => {
+    const info = await this.statsService.getBlockChainInfo();
     ctx.response.body = info;
   };
 

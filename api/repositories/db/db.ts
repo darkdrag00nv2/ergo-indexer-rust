@@ -15,11 +15,11 @@ export class DbPool {
     this.pool = new postgres.Pool(
       dbOptions,
       Number(config.DB_NUM_CONNECTIONS),
-      true,
+      /*lazy=*/ true,
     );
   }
 
-  get_connection(): Promise<postgres.PoolClient> {
-    return this.pool.connect();
+  async get_connection(): Promise<postgres.PoolClient> {
+    return await this.pool.connect();
   }
 }

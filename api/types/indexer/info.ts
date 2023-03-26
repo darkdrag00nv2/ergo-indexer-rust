@@ -2,5 +2,5 @@ export interface BlockChainInfo {
   version: string;
   supply: number;
   transactionAverage: number;
-  hashRate: string;
+  hashRate: number;
 }
