@@ -2,7 +2,7 @@ import { Application } from "./deps.ts";
 import { router } from "./routes/routes.ts";
 import { log, oakCors } from "./deps.ts";
 import * as middlewares from "./middlewares/middlewares.ts";
-import { config } from "./config/config.ts";
+import { config } from "./common/config.ts";
 
 const PORT = config.PORT || 3000;
 const HOST = config.HOST || "localhost";

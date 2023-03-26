@@ -1,4 +1,4 @@
-import { config } from "../../config/config.ts";
+import { config } from "../../common/config.ts";
 import { postgres } from "./../../deps.ts";
 
 export class DbPool {
