@@ -16,6 +16,7 @@ import {
   validate,
   ValidationRules,
 } from "https://deno.land/x/validasaur@v0.15.0/mod.ts";
+import * as postgres from "https://deno.land/x/postgres@v0.17.0/mod.ts";
 
 export {
   Application,
@@ -27,6 +28,7 @@ export {
   isHttpError,
   log,
   oakCors,
+  postgres,
   required,
   Router,
   Status,
