@@ -5,7 +5,10 @@ import {
   TransactionRepo,
 } from "../repositories/repositories.ts";
 import { Header } from "../types/indexer/header.ts";
-import { BlockChainInfo } from "../types/indexer/info.ts";
+import {
+  BlockChainInfo,
+  getDefaultBlockChainInfo,
+} from "../types/indexer/info.ts";
 
 export class StatsService {
   private secondsIn24H = (24 * 60 * 60);
@@ -27,12 +30,7 @@ export class StatsService {
     const hashRate = this.dailyHashRate(diff);
 
     return option.match<Header, BlockChainInfo>(
-      () => ({
-        version: "0.0.0",
-        supply: 0,
-        transactionAverage: 0,
-        hashRate: 0,
-      }),
+      () => (getDefaultBlockChainInfo()),
       (h) => ({
         version: h.version.toString(),
         supply: 1,
